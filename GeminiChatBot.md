@@ -34,7 +34,7 @@ The Python SDK for the Gemini API, is contained in the google-generativeai packa
 pip install -q -U google-generativeai #run on command prompt
 ```
 
-### 3. Building Your Chatbot in Python
+### 3. Building Your Chatbot in Python (METHOD 01)
 We’ll explore how to construct your chatbot: a command-line interface (CLI) for quick prototyping
 
 ```javascript
@@ -82,4 +82,75 @@ Gemini:  As of January 2023, Elon Musk is 51 years old. He was born on June 28, 
 
 This Python code shows how we can use Generative AI framework and Gemini API (get the API Key from Google AI Studio) to create our own Chatbot, leverage the underlyding multimodel Gemini LLM.  
 
+### 6. Building Your Chatbot in Python (METHOD 02)
+Create a file named gemini-bot.py and add the following code to it.
 
+```javascript
+import streamlit as st
+import os
+import google.generativeai as genai
+
+st.title("Gemini Bot")
+
+os.environ['GOOGLE_API_KEY'] = "AIzaSyAjsDpD-XXXXXXXXXXXXX"
+genai.configure(api_key = os.environ['GOOGLE_API_KEY'])
+
+# Select the model
+model = genai.GenerativeModel('gemini-pro')
+
+# Initialize chat history
+if "messages" not in st.session_state:
+    st.session_state.messages = [
+        {
+            "role":"assistant",
+            "content":"Ask me Anything"
+        }
+    ]
+
+# Display chat messages from history on app rerun
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
+
+# Process and store Query and Response
+def llm_function(query):
+    response = model.generate_content(query)
+
+    # Displaying the Assistant Message
+    with st.chat_message("assistant"):
+        st.markdown(response.text)
+
+    # Storing the User Message
+    st.session_state.messages.append(
+        {
+            "role":"user",
+            "content": query
+        }
+    )
+
+    # Storing the User Message
+    st.session_state.messages.append(
+        {
+            "role":"assistant",
+            "content": response.text
+        }
+    )
+
+# Accept user input
+query = st.chat_input("What's up?")
+
+# Calling the Function when Input is Provided
+if query:
+    # Displaying the User Message
+    with st.chat_message("user"):
+        st.markdown(query)
+
+    llm_function(query)
+```
+
+### 7. Run the app by executing the following command: 
+```javascript
+streamlit run gemini-bot.py
+```
+
+### 8. Open the link which is displayed on the terminal to access the application
